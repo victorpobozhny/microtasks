@@ -4,6 +4,7 @@ import NewComponent from "./site/NewComponent";
 import TopCars from "./site/TopCars";
 import Button from "./site/Button";
 import Dollars from "./site/Dollars";
+import ComponentForTasks from "./site/ComponentForTasks";
 
 
 export type ArgType = 1 | 2 | 3
@@ -87,6 +88,7 @@ function App() {
             <Button name={'YT channel 1'} callBack={()=>Button1Foo('I\'m Vasya', 21)}/>
             <Button name={'YT channel 2'} callBack={()=>Button2Foo('I\'m Ivan', 22)}/>
             <Button name={"I'm stupid Button ever"} callBack={Button3Foo}/>
+            <ComponentForTasks />
         </div>
 
     );
