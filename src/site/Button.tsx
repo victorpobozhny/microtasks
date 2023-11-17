@@ -3,7 +3,7 @@ import React, {FC} from 'react'
 
 type PropsButtonType = {
     name: string
-    callBack: ()=>void
+    callBack: () => void
 }
 
 const Button: FC<PropsButtonType> = (props) => {
