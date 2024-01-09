@@ -34,3 +34,10 @@
     text-align: center;
     color: white;
 }
+.navLink {
+    text-decoration: none;
+    color: #282c34;
+}
+.navLink:hover {
+    color: #7fb8f1
+}
