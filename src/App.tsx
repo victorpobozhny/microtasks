@@ -1,65 +1,101 @@
 import React, {useState} from 'react';
-import styles from "./components/Site.module.css";
-import {
-    NavLink,
-    Navigate,
-    Route,
-    Routes
-} from "react-router-dom";
-import {Error404} from "./components/pages/Error404";
-import {PageOne} from "./components/pages/PageOne";
-import {PageTwo} from "./components/pages/PageTwo";
-import {PageThree} from "./components/pages/PageThree";
-import {s} from './components/pages/_styles'
+import './App.css';
+import {TaskType, Todolist} from './Todolist';
+import {v1} from 'uuid';
+import {AddItemForm} from './AddItemForm';
+import {AppBar, Button, Container, Grid, IconButton, Paper, Toolbar, Typography} from "@mui/material";
+import {Menu} from "@mui/icons-material";
+import {useTasks} from "./customHooks/useTasks";
+import {useTodolists} from "./customHooks/useTodolists";
+let todolistId1 = v1();
+let todolistId2 = v1();
 
+export type FilterValuesType = "all" | "active" | "completed";
+export type TodolistType = {
+    id: string
+    title: string
+    filter: FilterValuesType
+}
 
-//объект с путями
-const PATH = {
-    PAGE1: '/page1',
-    PAGE2: '/page2',
-    PAGE3: '/page3',
-    ERROR: '/error404'
-} as const
+export type TasksStateType = {
+    [key: string]: Array<TaskType>
+}
 
 
 function App() {
+
+    const {
+        tasks,
+        addTask,
+        removeTask,
+        changeTaskTitle,
+        changeStatus,
+        addArrayOfTasks,
+        removeArrayOfTasks
+    } = useTasks(todolistId1, todolistId2)
+
+    const {
+        todolists,
+        changeTodolistTitle,
+        changeFilter,
+        addTodolist,
+        removeTodolist
+    } = useTodolists(todolistId1, todolistId2, addArrayOfTasks, removeArrayOfTasks)
+
     return (
-        <div>
-            <s.Header><h1>HEADER</h1></s.Header>
-            <s.Body>
-                <s.Nav>
-                    Здесь будет навигация
-                    {/*<div ><NavLink to={'/page1'} className={styles.navLink}>Page1</NavLink></div>*/}
-                    {/*<div ><NavLink to={'/page2'} className={styles.navLink}>Page2</NavLink></div>*/}
-                    {/*<div ><NavLink to={'/page3'} className={styles.navLink}>Page3</NavLink></div>*/}
-                    {/*    стилизация через styled-components*/}
-                    <s.NavWrapper ><NavLink to={PATH.PAGE1} className={styles.navLink}>Page1</NavLink></s.NavWrapper>
-                    <s.NavWrapper ><NavLink to={PATH.PAGE2} className={styles.navLink}>Page2</NavLink></s.NavWrapper>
-                    <s.NavWrapper ><NavLink to={PATH.PAGE3} className={styles.navLink}>Page3</NavLink></s.NavWrapper>
-                </s.Nav>
-                <s.Content>
-                    <Routes>
+        <div className="App">
+            <AppBar position="static">
+                <Toolbar>
+                    <IconButton edge="start" color="inherit" aria-label="menu">
+                        <Menu/>
+                    </IconButton>
+                    <Typography variant="h6">
+                        News
+                    </Typography>
+                    <Button color="inherit">Login</Button>
+                </Toolbar>
+            </AppBar>
+            <Container fixed>
+                <Grid container style={{padding: "20px"}}>
+                    <AddItemForm addItem={addTodolist}/>
+                </Grid>
+                <Grid container spacing={3}>
+                    {
+                        todolists.map(tl => {
+                            let allTodolistTasks = tasks[tl.id];
+                            let tasksForTodolist = allTodolistTasks;
 
-                        <Route path="/" element={< Navigate to={PATH.PAGE1}/>}/>
+                            if (tl.filter === "active") {
+                                tasksForTodolist = allTodolistTasks.filter(t => !t.isDone);
+                            }
+                            if (tl.filter === "completed") {
+                                tasksForTodolist = allTodolistTasks.filter(t => t.isDone);
+                            }
 
-
-                        <Route path={PATH.PAGE1} element={<PageOne/>}/>
-                        <Route path={PATH.PAGE2} element={<PageTwo/>}/>
-                        <Route path={PATH.PAGE3} element={<PageThree/>}/>
-
-                        <Route path={'*'} element={<Error404/>}/>
-                        <Route path='*' element={<Navigate to={PATH.ERROR}/>}/>
-
-                        {/*<Route path={PATH.ERROR} element={<Error404/>}/>*/}
-                        {/*<Route path='*' element={<Navigate to={PATH.ERROR}/>}/>*/}
-                    </Routes>
-
-                </s.Content>
-            </s.Body>
-            <s.Footer>abibas 2023</s.Footer>
+                            return <Grid key={tl.id} item>
+                                <Paper style={{padding: "10px"}}>
+                                    <Todolist
+                                        key={tl.id}
+                                        id={tl.id}
+                                        title={tl.title}
+                                        tasks={tasksForTodolist}
+                                        removeTask={removeTask}
+                                        changeFilter={changeFilter}
+                                        addTask={addTask}
+                                        changeTaskStatus={changeStatus}
+                                        filter={tl.filter}
+                                        removeTodolist={removeTodolist}
+                                        changeTaskTitle={changeTaskTitle}
+                                        changeTodolistTitle={changeTodolistTitle}
+                                    />
+                                </Paper>
+                            </Grid>
+                        })
+                    }
+                </Grid>
+            </Container>
         </div>
     );
 }
 
 export default App;
-
